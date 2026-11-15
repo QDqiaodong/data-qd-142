@@ -1,0 +1,13 @@
+[build-system]
+requires = ["setuptools==80.9.0", "wheel==0.45.1"]
+build-backend = "setuptools.build_meta"
+[project]
+name = "data-qd-142"
+version = "0.1.0"
+description = "Smoothed categorical distribution comparison with coverage audits"
+requires-python = ">=3.11"
+dependencies = []
+[project.scripts]
+distribution-drift = "distribution_drift.cli:main"
+[tool.setuptools.packages.find]
+where = ["src"]

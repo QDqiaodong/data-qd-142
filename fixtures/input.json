@@ -1,0 +1,28 @@
+{
+  "categories": [
+    "a",
+    "b",
+    "c"
+  ],
+  "reference": [
+    {
+      "category": "a",
+      "count": 8
+    },
+    {
+      "category": "b",
+      "count": 2
+    }
+  ],
+  "current": [
+    {
+      "category": "a",
+      "count": 2
+    },
+    {
+      "category": "b",
+      "count": 8
+    }
+  ],
+  "alpha": 1
+}
