@@ -1,0 +1,29 @@
+{
+  "alpha": 1,
+  "categories": [
+    "a",
+    "b",
+    "c"
+  ],
+  "current": [
+    {
+      "partition": "shard-0",
+      "revision": 2
+    },
+    {
+      "partition": "shard-1",
+      "revision": 1
+    }
+  ],
+  "reference": [
+    {
+      "partition": "shard-0",
+      "revision": 2
+    },
+    {
+      "partition": "shard-1",
+      "revision": 1
+    }
+  ],
+  "snapshot_id": "fixed-example-0001"
+}

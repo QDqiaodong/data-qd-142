@@ -1,0 +1,16 @@
+{
+  "counts": [
+    {
+      "category": "a",
+      "delta": 5
+    },
+    {
+      "category": "b",
+      "delta": 2
+    }
+  ],
+  "parent_sha256": null,
+  "partition": "shard-0",
+  "revision": 1,
+  "side": "reference"
+}

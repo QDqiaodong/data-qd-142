@@ -27,6 +27,26 @@ python3 -m venv .venv
 src/distribution_drift/model.py 为业务模型，相关算法模块独立组织；common.py 提供受限JSON及报告发布，
 cli.py 衔接数据链路。fixtures 为明确自制样例，代码与样例采用MIT许可。
 
+## 分区增量账本与封存快照（修订链）
+
+`snapshot.py` + `snapshot_cli.py` 在 SQLite 上提供不可变修订链与可复现封存报告，
+设计、事务边界、资源/恢复代价与限额见 [封存快照设计](docs/snapshot.md)。
+
+```sh
+python -m distribution_drift.snapshot_cli init --db run/ledger.db
+python -m distribution_drift.snapshot_cli ingest --db run/ledger.db --source SHARD.json
+python -m distribution_drift.snapshot_cli seal --db run/ledger.db \
+  --manifest MANIFEST.json --output run/report.json
+```
+
+分片 `parent_sha256` 引用同 side/partition 前一修订**原始输入字节**的 SHA-256；
+同版本同字节幂等、同版本异字节冲突拒绝。缺父修订（含迟到更正、负累计链）一律先入账，
+封存时在单个 `BEGIN IMMEDIATE` 事务内按需流式追溯完整引用前缀：父链有缺口、
+父 SHA 不匹配、delta 越域、任一前缀累计为负、每类计数超 10^9 或侧总量为 0 均拒绝封存；
+补齐缺失父修订后同一 manifest 可一次解锁已存后代。封存后报告按 snapshot_id 与
+manifest 原始字节 SHA 锁定，重放返回字节一致的原报告，新后代不可改写旧报告。
+固定示例在 `fixtures/snapshot/`，其报告数值与 `analyze` 完全一致。
+
 ## 当前业务与样例
 # Categorical drift accounting v1
 

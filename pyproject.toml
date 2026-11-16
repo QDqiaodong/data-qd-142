@@ -9,5 +9,6 @@ requires-python = ">=3.11"
 dependencies = []
 [project.scripts]
 distribution-drift = "distribution_drift.cli:main"
+distribution-drift-snapshot = "distribution_drift.snapshot_cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]

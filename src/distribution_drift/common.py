@@ -31,6 +31,35 @@ def read(path):
     data=json.loads(raw,object_pairs_hook=unique,parse_constant=invalid)
     return data,hashlib.sha256(raw).hexdigest()
 
+def parse_strict(raw):
+    """Parse JSON bytes: duplicate keys and NaN/Infinity constants are rejected."""
+    if not isinstance(raw,(bytes,bytearray)):raise TypeError('JSON input must be bytes')
+    if len(raw)>8_000_000:raise ValueError('JSON exceeds 8 MB')
+    def unique(pairs):
+        result={}
+        for k,v in pairs:
+            if k in result:raise ValueError('duplicate JSON key: '+k)
+            result[k]=v
+        return result
+    def invalid(v):raise ValueError('nonfinite JSON number: '+v)
+    return json.loads(bytes(raw),object_pairs_hook=unique,parse_constant=invalid)
+
+def read_bytes(path):
+    with Path(path).open('rb') as stream:raw=stream.read(8_000_001)
+    if len(raw)>8_000_000:raise ValueError('JSON exceeds 8 MB')
+    return raw
+
+def save_bytes(path,data):
+    dest=Path(path)
+    if dest.is_symlink():raise ValueError('output cannot be a symlink')
+    dest.parent.mkdir(parents=True,exist_ok=True);temp=None
+    try:
+        with tempfile.NamedTemporaryFile(mode='wb',dir=dest.parent,delete=False) as stream:
+            temp=stream.name;stream.write(data)
+        os.replace(temp,dest)
+    finally:
+        if temp and os.path.exists(temp):os.unlink(temp)
+
 def save(path,report):
     dest=Path(path)
     if dest.is_symlink():raise ValueError('output cannot be a symlink')
