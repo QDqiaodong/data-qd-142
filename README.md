@@ -47,6 +47,30 @@ python -m distribution_drift.snapshot_cli seal --db run/ledger.db \
 manifest 原始字节 SHA 锁定，重放返回字节一致的原报告，新后代不可改写旧报告。
 固定示例在 `fixtures/snapshot/`，其报告数值与 `analyze` 完全一致。
 
+## 实体人群迁移对账（audit / reconcile）
+
+`cohort.py` + `cohort_cli.py` 在临时 SQLite 外存上提供实体级人群迁移对账，
+解决聚合边际相同（PSI=0）却无法区分留存与互换类别的问题，设计、资格裁定与
+资源/临时空间代价见 [迁移对账设计](docs/cohort.md)。
+
+```sh
+python -m distribution_drift.cohort_cli audit \
+    --reference REF.jsonl --current CUR.jsonl --config CONFIG.json --output CONFLICTS.jsonl
+python -m distribution_drift.cohort_cli reconcile \
+    --reference REF.jsonl --current CUR.jsonl --config CONFIG.json \
+    --rulings RULINGS.jsonl --output REPORT.json
+```
+
+两份明细为 UTF-8 JSONL（每行严格 `{"entity","category"}`，空文件允许，单行 ≤65536
+字节，单侧 ≤1000 万行），同侧同实体同类重复观察折叠并保留原始行数，同侧同实体多类别
+才是冲突（不覆盖、不投票）。裁决只适用于当次该侧冲突实体，陈旧、重复、候选集合不匹配
+或选中域外的裁决整体报错。未解决或明确排除的冲突使整个实体在两侧隔离；接纳实体集合上
+做全外连接得到 retained/changed/entered/exited 与非零迁移格，接纳边际连同完整声明域
+交回 `analyze`；任一侧总量为 0 时 `distribution=null` 且标记 `insufficient_population`，
+绝不塞伪计数。输入一次性顺序读取、不依赖 seek，全部实体比例状态位于即用即删的临时库，
+峰值 RSS 控制在 128 MiB 内（实测 120 万行约 36 MiB），结果 JSON 原子发布并沿用现有
+目标安全边界。本功能不新增分区修订、封存或快照数据库。
+
 ## 当前业务与样例
 # Categorical drift accounting v1
 

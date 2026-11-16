@@ -10,5 +10,6 @@ dependencies = []
 [project.scripts]
 distribution-drift = "distribution_drift.cli:main"
 distribution-drift-snapshot = "distribution_drift.snapshot_cli:main"
+distribution-drift-cohort = "distribution_drift.cohort_cli:main"
 [tool.setuptools.packages.find]
 where = ["src"]
