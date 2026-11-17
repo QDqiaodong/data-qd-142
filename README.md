@@ -99,6 +99,32 @@ UTF-8 JSONL（事件 `{source,seq,kind:"event",ts,category}` 或水位
 重跑即补齐——同字节视为成功，异字节或符号链接报错保留。固定示例在 `fixtures/stream/`，
 其报告数值与 `analyze` 完全一致。
 
+## 跨批次安全汇总发布工作台（init / preview / release / receipt）
+
+`disclosure.py` + `disclosure_cli.py` 在 SQLite 上提供跨批次安全汇总发布：同一份固定
+私有频数向量持续向合作方公开"类别子集原始计数和"，两个各自安全的汇总组合相减可能暴露
+受保护类别，因此每次发布都针对**全部已公开历史**做精确有理线性推断判定与全局最优选择。
+威胁模型、知识表示、精确优化与无长写事务协调方案见
+[安全发布工作台设计](docs/disclosure.md)。
+
+```sh
+python -m distribution_drift.disclosure_cli init    --db run/workbench.db --spec fixtures/disclosure/spec.json
+python -m distribution_drift.disclosure_cli preview --db run/workbench.db --request fixtures/disclosure/request-ab.json
+python -m distribution_drift.disclosure_cli release --db run/workbench.db --request fixtures/disclosure/request-ab.json
+python -m distribution_drift.disclosure_cli release --db run/workbench.db --request fixtures/disclosure/request-b.json
+python -m distribution_drift.disclosure_cli receipt --db run/workbench.db --request-id partner-batch-1
+```
+
+init 严格为 `{categories,counts,protected}`（2..32 个唯一类别、每类恰好一次 0..10⁹
+严格整数计数、非空唯一受保护子集），私有向量在库内固定，规范相同（数组顺序无关）重开
+幂等、任何差异拒绝。发布请求严格为 `{request_id,queries}`（≤22 条 `{id,members,utility}`），
+安全定义仅限精确有理线性推断：历史已公开行与本批选中行张成的有理行空间中不得出现任何
+受保护类别的单位向量。规划器用 `fractions.Fraction` 精确运算在所有安全子集中最大化
+效用和（并列取 id 元组字典序最小），求解期间不持有 SQLite 写事务；提交在短
+`BEGIN IMMEDIATE` 事务内重验历史代次，过期即回滚重算，支持同库多进程并发 release。
+回执只含 request_id、代次、总效用与选中 `{id,members,value}`，重放同规范请求返回
+原回执字节，同 ID 异请求整体拒绝。固定示例在 `fixtures/disclosure/`。
+
 ## 当前业务与样例
 # Categorical drift accounting v1
 

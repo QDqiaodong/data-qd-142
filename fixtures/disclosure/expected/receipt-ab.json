@@ -1,0 +1,15 @@
+{
+  "generation": 0,
+  "request_id": "partner-batch-1",
+  "selected": [
+    {
+      "id": "q-ab",
+      "members": [
+        "a",
+        "b"
+      ],
+      "value": 120
+    }
+  ],
+  "total_utility": 5
+}

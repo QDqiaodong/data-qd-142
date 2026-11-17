@@ -1,0 +1,2 @@
+{"request_id": "partner-batch-1",
+ "queries": [{"id": "q-ab", "members": ["a", "b"], "utility": 5}]}

@@ -1,0 +1,5 @@
+{"categories": ["a", "b", "c"],
+ "counts": [{"category": "a", "count": 100},
+            {"category": "b", "count": 20},
+            {"category": "c", "count": 7}],
+ "protected": ["a"]}
