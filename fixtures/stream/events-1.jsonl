@@ -1,0 +1,7 @@
+{"source":"sensor-a","seq":1,"kind":"event","ts":3,"category":"a"}
+{"source":"sensor-a","seq":2,"kind":"event","ts":7,"category":"b"}
+{"source":"sensor-b","seq":1,"kind":"event","ts":4,"category":"a"}
+{"source":"sensor-a","seq":3,"kind":"event","ts":12,"category":"c"}
+{"source":"sensor-b","seq":2,"kind":"event","ts":11,"category":"a"}
+{"source":"sensor-a","seq":4,"kind":"watermark","time":18}
+{"source":"sensor-b","seq":3,"kind":"watermark","time":15}

@@ -1,0 +1,95 @@
+{
+  "alpha": 1,
+  "categories": [
+    "a",
+    "b",
+    "c"
+  ],
+  "closed_at": {
+    "min_watermark": 30,
+    "sources": {
+      "sensor-a": {
+        "committed_seq": 7,
+        "watermark": 30
+      },
+      "sensor-b": {
+        "committed_seq": 6,
+        "watermark": 30
+      }
+    }
+  },
+  "current": {
+    "counts": {
+      "a": 1,
+      "b": 0,
+      "c": 0
+    },
+    "total": 1
+  },
+  "distribution": {
+    "appeared": [],
+    "categories": [
+      {
+        "category": "a",
+        "current_count": 1,
+        "delta": "1/6",
+        "js_contribution": 0.00838979731278703,
+        "p": "1/3",
+        "psi_contribution": 0.06757751801802739,
+        "q": "1/2",
+        "reference_count": 1
+      },
+      {
+        "category": "b",
+        "current_count": 0,
+        "delta": "-1/12",
+        "js_contribution": 0.002986397125679798,
+        "p": "1/3",
+        "psi_contribution": 0.023973506037648407,
+        "q": "1/4",
+        "reference_count": 1
+      },
+      {
+        "category": "c",
+        "current_count": 0,
+        "delta": "-1/12",
+        "js_contribution": 0.002986397125679798,
+        "p": "1/3",
+        "psi_contribution": 0.023973506037648407,
+        "q": "1/4",
+        "reference_count": 1
+      }
+    ],
+    "current_total": 1,
+    "disappeared": [
+      "b",
+      "c"
+    ],
+    "jensen_shannon_nats": 0.014362591564146626,
+    "psi": 0.1155245300933242,
+    "reference_total": 3
+  },
+  "distribution_status": "ok",
+  "kind": "window_report",
+  "reference": {
+    "counts": {
+      "a": 1,
+      "b": 1,
+      "c": 1
+    },
+    "total": 3
+  },
+  "schema_version": 1,
+  "window": {
+    "current": {
+      "end": 30,
+      "start": 20
+    },
+    "end": 30,
+    "reference": {
+      "end": 20,
+      "start": 10
+    },
+    "width": 10
+  }
+}

@@ -71,6 +71,34 @@ python -m distribution_drift.cohort_cli reconcile \
 峰值 RSS 控制在 128 MiB 内（实测 120 万行约 36 MiB），结果 JSON 原子发布并沿用现有
 目标安全边界。本功能不新增分区修订、封存或快照数据库。
 
+## 事件时间漂移监测管道（init / apply / export / status）
+
+`stream.py` + `stream_cli.py` 在 SQLite 上提供可重启的事件时间漂移监测：多采集源
+分类事件与水位持续到达，以全体源最小水位 G 为完整性边界，只关闭所有源都承诺完整的
+窗口并可靠交付最终报告。设计、事务边界、历史保留与恢复办法见
+[事件时间管道设计](docs/stream.md)。
+
+```sh
+python -m distribution_drift.stream_cli init   --db run/pipeline.db --config fixtures/stream/config.json
+python -m distribution_drift.stream_cli apply  --db run/pipeline.db --input fixtures/stream/events-1.jsonl
+python -m distribution_drift.stream_cli apply  --db run/pipeline.db --input fixtures/stream/events-2.jsonl
+python -m distribution_drift.stream_cli status --db run/pipeline.db
+python -m distribution_drift.stream_cli export --db run/pipeline.db --output-dir run/windows
+```
+
+配置严格为 `{sources,categories,alpha,width}`（1..64 个唯一源、类别与 alpha 沿用
+`analyze`、width 为 1..10⁶ 严格整数），在库内固定、重开不丢进度。apply 一次性顺序读取
+UTF-8 JSONL（事件 `{source,seq,kind:"event",ts,category}` 或水位
+`{source,seq,kind:"watermark",time"}`），每源 seq 从 1 连续接纳；任意批次可重放已提交
+序号，规范载荷完全相同才幂等（空白与键序无关），同序号异载荷整批拒绝。事件 ts 小于
+该源当前水位时记为 late（消耗序号、可流式审计、绝不计入窗口），ts 等于水位仍接纳，
+重放不按当前水位改判历史。窗口 `E=k*width (k>=2, E<=G)` 恰好关闭一次：双空窗不出文件，
+其余窗口单侧为空时 `distribution=null` 并标记 `insufficient_population`，两侧均正时
+复用 `analyze` 保留精确分数与双零类平滑。整次 apply 单事务提交（末行无效也整批回滚），
+报告关闭时序列化存库；export 按存储字节原子发布 `window-END.json` 并逐条确认，崩溃后
+重跑即补齐——同字节视为成功，异字节或符号链接报错保留。固定示例在 `fixtures/stream/`，
+其报告数值与 `analyze` 完全一致。
+
 ## 当前业务与样例
 # Categorical drift accounting v1
 
